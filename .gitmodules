@@ -1,0 +1,3 @@
+[submodule "native-windows-gui"]
+	path = native-windows-gui
+	url = https://github.com/hch12907/native-windows-gui
