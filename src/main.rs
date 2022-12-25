@@ -6,51 +6,7 @@ extern crate native_windows_derive as nwd;
 use std::{ffi::OsString, cell::RefCell};
 
 use nwd::NwgUi;
-use nwg::{NativeUi, EventData, subclass_control, Button, ButtonFlags};
-use winapi::um::winuser as win32;
-
-#[derive(Default)]
-pub struct GroupBox {
-    base: nwg::Button,
-}
-
-pub struct GroupBoxBuilder<'a> {
-    button_builder: nwg::ButtonBuilder<'a>,
-}
-
-impl<'a> GroupBoxBuilder<'a> {
-    fn text(self, s: &'a str) -> GroupBoxBuilder<'a> {
-        Self { button_builder: self.button_builder.text(s) }
-    }
-
-    pub fn parent<C: Into<nwg::ControlHandle>>(mut self, p: C) -> GroupBoxBuilder<'a> {
-        self.button_builder = self.button_builder.parent(p);
-        self
-    }
-
-    pub fn build(self, btn: &mut GroupBox) -> Result<(), nwg::NwgError> {
-        self.button_builder.build(&mut btn.base)?;
-        Ok(())
-    }
-}
-
-impl GroupBox {
-    fn builder<'a>() -> GroupBoxBuilder<'a> {
-        let builder = Button::builder()
-            .flags(unsafe {
-                ButtonFlags::from_bits_unchecked(win32::WS_CHILD | win32::WS_VISIBLE | win32::WS_TABSTOP | win32::BS_NOTIFY | win32::BS_GROUPBOX) 
-            })
-            .position((20, 30))
-            .size((100, 200))
-            .enabled(true);
-
-        GroupBoxBuilder {
-            button_builder: builder,
-        }
-    }
-}
-
-subclass_control!(GroupBox, Button, base);
+use nwg::{NativeUi, EventData};
 
 #[derive(Default, NwgUi)]
 pub struct Waifu2xApp {
@@ -108,9 +64,6 @@ pub struct Waifu2xApp {
         action: nwg::FileDialogAction::OpenDirectory
     )]
     save_file_dialog: nwg::FileDialog,
-
-    #[nwg_control(text: "text 1 2 3")]
-    frame: GroupBox,
 
     state: RefCell<Waifu2xState>,
 }
