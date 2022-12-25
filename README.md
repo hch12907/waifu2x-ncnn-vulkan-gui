@@ -5,6 +5,8 @@ I did this mostly because why not? In the future, I plan to add a GTK or Qt-base
 implementation for Linux and MacOS. (I initially *was* trying to do that but Rust
 and Qt doesn't mesh well together, and GTK4 on Windows is just yuck.)
 
+![screenshot](./screenshot.png)
+
 ## Usage
 
 1. `cargo build` the project.
