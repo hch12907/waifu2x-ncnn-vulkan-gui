@@ -66,7 +66,7 @@ pub struct Waifu2xApp {
     #[nwg_control(text: "Start")]
     #[nwg_layout_item(layout: grid, col: 0, row: 2, row_span: 1, col_span: 11)]
     #[nwg_events( OnButtonClick: [Waifu2xApp::start_clicked] )]
-    hello_button: nwg::Button,
+    start_button: nwg::Button,
 
     // `tabs` begin here
     #[nwg_control]
@@ -288,7 +288,6 @@ impl Waifu2xApp {
     }
 
     fn on_quit(&self) {
-        //nwg::modal_info_message(&self.window, "Goodbye", &format!("Goodbye {}", self.output_path.text()));
         nwg::stop_thread_dispatch();
     }
 
@@ -384,7 +383,7 @@ impl Waifu2xApp {
                 Ok(None) => false,
                 Ok(Some(status)) => {
                     if !status.success() {
-                        self.hello_button.set_text("Processing... (error occured!)");
+                        self.start_button.set_text("Processing... (error occured!)");
                         true
                     } else {
                         true
@@ -408,12 +407,12 @@ impl Waifu2xApp {
 
         if state.children.is_empty() {
             self.timer.stop();
-            if self.hello_button.text().contains("error") {
-                self.hello_button.set_text("Start (error occured!)");
+            if self.start_button.text().contains("error") {
+                self.start_button.set_text("Start (error occured!)");
             } else {
-                self.hello_button.set_text("Start")
+                self.start_button.set_text("Start")
             }
-            self.hello_button.set_enabled(true);
+            self.start_button.set_enabled(true);
         }
     }
 
@@ -485,8 +484,8 @@ impl Waifu2xApp {
 
         drop(state);
 
-        self.hello_button.set_text("Processing...");
-        self.hello_button.set_enabled(false);
+        self.start_button.set_text("Processing...");
+        self.start_button.set_enabled(false);
         self.timer.start();
         self.state.borrow_mut().children = children;
     }
