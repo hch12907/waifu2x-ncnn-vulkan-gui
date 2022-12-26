@@ -5,12 +5,13 @@ extern crate native_windows_gui as nwg;
 
 use std::cell::RefCell;
 use std::ffi::OsString;
+use std::os::windows::prelude::{OsStrExt, OsStringExt};
 use std::path::PathBuf;
 use std::process::{Child, Command};
 
 use nwd::NwgUi;
 use nwg::{
-    AnimationTimer, CheckBox, CheckBoxState, EventData, Frame, NativeUi, RadioButton, Tab,
+    AnimationTimer, CheckBox, CheckBoxState, EventData, Font, NativeUi, RadioButton, Tab,
     TabsContainer, TextInput,
 };
 
@@ -190,7 +191,7 @@ pub struct Waifu2xApp {
     #[nwg_events(OnTextInput: [Waifu2xApp::model_path_changed])]
     model_path: TextInput,
 
-    // `tabs::processing_tab` begins here
+    // `tabs::processing_tab` ends here
     // `tabs::output_tab` begins here
     #[nwg_control(parent: tabs, text: "Output")]
     output_tab: Tab,
@@ -219,6 +220,20 @@ pub struct Waifu2xApp {
     #[nwg_events(OnButtonClick: [Waifu2xApp::format_clicked(SELF, CTRL)])]
     format_webp: RadioButton,
 
+    #[nwg_control(text: "Output Name", background_color: WHITE)]
+    #[nwg_layout_item(layout: grid, col: 0, row: 1, col_span: 2)]
+    filename_label: nwg::Label,
+
+    #[nwg_control(text: "{name}_{scale}x_{denoise}n", background_color: WHITE)]
+    #[nwg_layout_item(layout: grid, col: 2, row: 1, col_span: 8)]
+    #[nwg_events(OnTextInput: [Waifu2xApp::filename_changed])]
+    filename_format: TextInput,
+
+    #[nwg_control(text: "{name}, {scale}, {denoise}, {model} will be replaced with specific values.\nAn extension will be automatically appended to the filename.", background_color: WHITE)]
+    #[nwg_layout_item(layout: grid, col: 0, row: 2, col_span: 10, row_span: 2)]
+    filename_advice_label: nwg::Label,
+
+    // `tabs::output_tab` ends here
     #[nwg_resource(
         title: "Open File",
         action: nwg::FileDialogAction::Open,
@@ -237,6 +252,9 @@ pub struct Waifu2xApp {
     #[nwg_events(OnTimerTick: [Waifu2xApp::timer_ticked])]
     timer: AnimationTimer,
 
+    #[nwg_resource(family: "Segoe UI", size: 16)]
+    advice_font: Font,
+
     state: RefCell<Waifu2xState>,
 }
 
@@ -250,6 +268,7 @@ pub struct Waifu2xState {
     thread_count: String,
     gpu_id: String,
     model_path: String,
+    filename_format: String,
     children: Vec<Child>,
 }
 
@@ -265,6 +284,7 @@ impl Default for Waifu2xState {
             thread_count: String::new(),
             gpu_id: String::new(),
             model_path: String::new(),
+            filename_format: String::from("{name}_{scale}x_{denoise}n"),
             children: Vec::new(),
         }
     }
@@ -281,7 +301,9 @@ impl Waifu2xState {
 }
 
 impl Waifu2xApp {
-    fn on_init(&self) {}
+    fn on_init(&self) {
+        self.filename_advice_label.set_font(Some(&self.advice_font));
+    }
 
     fn on_minmax(&self, data: &EventData) {
         data.on_min_max().set_min_size(700, 450);
@@ -372,6 +394,10 @@ impl Waifu2xApp {
         self.state.borrow_mut().model_path = self.model_path.text();
     }
 
+    fn filename_changed(&self) {
+        self.state.borrow_mut().filename_format = self.filename_format.text();
+    }
+
     fn timer_ticked(&self) {
         let mut state = self.state.borrow_mut();
 
@@ -421,7 +447,7 @@ impl Waifu2xApp {
         let mut children = Vec::new();
 
         for f in state.selected_files.iter() {
-            let input = PathBuf::from(f);
+            let mut input = PathBuf::from(f);
             let mut output = PathBuf::from(state.output_dir.clone());
             let output_ext = match state.format {
                 Format::Png => "png",
@@ -429,8 +455,38 @@ impl Waifu2xApp {
                 Format::Webp => "webp",
             };
 
+            input.set_extension("");
+
             output.push(match input.file_name() {
-                Some(x) => x,
+                Some(x) => {
+                    let template = state
+                        .filename_format
+                        .replace("{scale}", &format!("{}", state.scale_level))
+                        .replace("{denoise}", &format!("{}", state.denoise_level))
+                        .replace("{model}", &state.model_path);
+
+                    let name_start = match template.find("{name}") {
+                        Some(x) => x,
+                        None => {
+                            nwg::error_message(
+                                "Error",
+                                "Output filename must contain a {name} section!",
+                            );
+                            return;
+                        }
+                    };
+
+                    let name_end = name_start + "{name}".len();
+
+                    let encoded = template
+                        .encode_utf16()
+                        .take(name_start)
+                        .chain(OsStrExt::encode_wide(x))
+                        .chain(template.encode_utf16().skip(name_end))
+                        .collect::<Vec<_>>();
+
+                    OsString::from_wide(&encoded)
+                }
                 None => {
                     nwg::error_message(
                         "Error",
