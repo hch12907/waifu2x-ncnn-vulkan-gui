@@ -11,8 +11,8 @@ use std::process::{Child, Command};
 
 use nwd::NwgUi;
 use nwg::{
-    AnimationTimer, CheckBox, CheckBoxState, EventData, Font, NativeUi, RadioButton, Tab,
-    TabsContainer, TextInput,
+    AnimationTimer, CheckBox, CheckBoxState, EventData, Font, MessageChoice, MessageIcons,
+    MessageParams, NativeUi, RadioButton, Tab, TabsContainer, TextInput,
 };
 
 const WHITE: Option<[u8; 3]> = Some([255, 255, 255]);
@@ -409,6 +409,11 @@ impl Waifu2xApp {
                 Ok(None) => false,
                 Ok(Some(status)) => {
                     if !status.success() {
+                        nwg::modal_error_message(
+                            &self.window,
+                            "Error",
+                            &format!("{:?}", status.code()),
+                        );
                         self.start_button.set_text("Processing... (error occured!)");
                         true
                     } else {
@@ -416,7 +421,8 @@ impl Waifu2xApp {
                     }
                 }
                 Err(e) => {
-                    nwg::error_message(
+                    nwg::modal_error_message(
+                        &self.window,
                         "Error",
                         &format!("Unexpected error occured while running Waifu2x: {}", e),
                     );
@@ -443,12 +449,59 @@ impl Waifu2xApp {
     }
 
     fn start_clicked(&self) {
-        let state = self.state.borrow();
+        let mut state = self.state.borrow_mut();
         let mut children = Vec::new();
+
+        if state.selected_files.is_empty() {
+            return;
+        }
+
+        if state.denoise_level == -1 && state.scale_level == 1 {
+            nwg::modal_info_message(
+                &self.window,
+                "Error",
+                "A denoise level and/or upscale ratio is not selected.",
+            );
+            return;
+        }
+
+        let output_dir = if !state.output_dir.is_empty() {
+            state.output_dir.clone()
+        } else {
+            let params = MessageParams {
+                title: "Output path selection",
+                content: concat!(
+                    "The output path is left unspecified.\n\n",
+                    "By default, this means the directory containing the application will be used.\n\n",
+                    "Do you want to change it to the input directory?"
+                ),
+                buttons: nwg::MessageButtons::YesNoCancel,
+                icons: MessageIcons::Question,
+            };
+            let choice = nwg::modal_message(&self.window, &params);
+
+            if choice == MessageChoice::Yes {
+                let mut path = PathBuf::from(&state.selected_files[0]);
+                if path.is_file() {
+                    path.pop();
+                }
+                self.output_path
+                    .set_text(&path.to_string_lossy().trim_start_matches("\\\\?\\"));
+                path.into_os_string()
+            } else if choice == MessageChoice::No {
+                let path = PathBuf::from(".").canonicalize().unwrap().into_os_string();
+                state.output_dir = path.clone();
+                self.output_path
+                    .set_text(&path.to_string_lossy().trim_start_matches("\\\\?\\"));
+                path
+            } else {
+                return;
+            }
+        };
 
         for f in state.selected_files.iter() {
             let mut input = PathBuf::from(f);
-            let mut output = PathBuf::from(state.output_dir.clone());
+            let mut output = PathBuf::from(&output_dir);
             let output_ext = match state.format {
                 Format::Png => "png",
                 Format::Jpg => "jpg",
@@ -542,12 +595,13 @@ impl Waifu2xApp {
             children.push(child);
         }
 
+        state.children = children;
+
         drop(state);
 
         self.start_button.set_text("Processing...");
         self.start_button.set_enabled(false);
         self.timer.start();
-        self.state.borrow_mut().children = children;
     }
 }
 
