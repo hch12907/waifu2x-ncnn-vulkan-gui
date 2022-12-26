@@ -521,7 +521,11 @@ impl Waifu2xApp {
             }
 
             if !state.model_path.is_empty() {
-                waifu2x = waifu2x.arg("-m").arg(&state.model_path)
+                waifu2x = waifu2x.arg("-m").arg(&state.model_path);
+            }
+
+            if state.tta_mode {
+                waifu2x = waifu2x.arg("-x");
             }
 
             let child = match waifu2x.spawn() {
