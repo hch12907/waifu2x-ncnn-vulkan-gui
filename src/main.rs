@@ -43,12 +43,12 @@ pub struct Waifu2xApp {
     input_label: nwg::Label,
 
     #[nwg_control(text: "")]
-    #[nwg_layout_item(layout: grid, row: 0, col: 2, col_span: 8)]
+    #[nwg_layout_item(layout: grid, row: 0, col: 2, col_span: 12)]
     input_path: nwg::TextInput,
 
     #[nwg_control(text: "...")]
     #[nwg_events(OnButtonClick: [Waifu2xApp::select_input_file])]
-    #[nwg_layout_item(layout: grid, row: 0, col: 10)]
+    #[nwg_layout_item(layout: grid, row: 0, col: 14)]
     input_button: nwg::Button,
 
     #[nwg_control(text: "Output path:")]
@@ -56,33 +56,33 @@ pub struct Waifu2xApp {
     output_label: nwg::Label,
 
     #[nwg_control(text: "")]
-    #[nwg_layout_item(layout: grid, row: 1, col: 2, col_span: 8)]
+    #[nwg_layout_item(layout: grid, row: 1, col: 2, col_span: 12)]
     output_path: nwg::TextInput,
 
     #[nwg_control(text: "...")]
-    #[nwg_layout_item(layout: grid, row: 1, col: 10)]
+    #[nwg_layout_item(layout: grid, row: 1, col: 14)]
     #[nwg_events(OnButtonClick: [Waifu2xApp::select_output_file])]
     output_button: nwg::Button,
 
     #[nwg_control(text: "Start")]
-    #[nwg_layout_item(layout: grid, col: 0, row: 2, row_span: 1, col_span: 11)]
+    #[nwg_layout_item(layout: grid, col: 0, row: 2, row_span: 1, col_span: 15)]
     #[nwg_events( OnButtonClick: [Waifu2xApp::start_clicked] )]
     start_button: nwg::Button,
 
     // `tabs` begin here
     #[nwg_control]
-    #[nwg_layout_item(layout: grid, col: 0, row: 3, row_span: 9, col_span: 11)]
+    #[nwg_layout_item(layout: grid, col: 0, row: 3, row_span: 9, col_span: 15)]
     tabs: TabsContainer,
 
     // `tabs::processing_tab` begins here
     #[nwg_control(text: "Processing")]
     processing_tab: Tab,
 
-    #[nwg_layout(parent: processing_tab, spacing: 5, margin: [0, 0, 0, 0])]
-    processing_tab_grid: nwg::GridLayout,
+    #[nwg_layout(parent: processing_tab, spacing: 2, margin: [1, 5, 1, 5])]
+    tab_grid: nwg::GridLayout,
 
     #[nwg_control(text: "Denoise Level", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 0, row: 0, col_span: 2)]
+    #[nwg_layout_item(layout: tab_grid, col: 0, row: 0, col_span: 2)]
     denoise_label: nwg::Label,
 
     #[nwg_control(
@@ -91,32 +91,32 @@ pub struct Waifu2xApp {
         flags: "VISIBLE|GROUP", 
         check_state: RadioButtonState::Checked
     )]
-    #[nwg_layout_item(layout: grid, col: 2, row: 0, col_span: 1)]
+    #[nwg_layout_item(layout: tab_grid, col: 2, row: 0, col_span: 1)]
     #[nwg_events( OnButtonClick: [Waifu2xApp::denoise_clicked(SELF, CTRL)] )]
     denoise_disable: RadioButton,
 
     #[nwg_control(text: "Level 0", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 3, row: 0, col_span: 1)]
+    #[nwg_layout_item(layout: tab_grid, col: 3, row: 0, col_span: 1)]
     #[nwg_events( OnButtonClick: [Waifu2xApp::denoise_clicked(SELF, CTRL)] )]
     denoise_level0: RadioButton,
 
     #[nwg_control(text: "Level 1", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 4, row: 0, col_span: 1)]
+    #[nwg_layout_item(layout: tab_grid, col: 4, row: 0, col_span: 1)]
     #[nwg_events( OnButtonClick: [Waifu2xApp::denoise_clicked(SELF, CTRL)] )]
     denoise_level1: RadioButton,
 
     #[nwg_control(text: "Level 2", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 5, row: 0, col_span: 1)]
+    #[nwg_layout_item(layout: tab_grid, col: 5, row: 0, col_span: 1)]
     #[nwg_events( OnButtonClick: [Waifu2xApp::denoise_clicked(SELF, CTRL)] )]
     denoise_level2: RadioButton,
 
     #[nwg_control(text: "Level 3", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 6, row: 0, col_span: 1)]
+    #[nwg_layout_item(layout: tab_grid, col: 6, row: 0, col_span: 1)]
     #[nwg_events( OnButtonClick: [Waifu2xApp::denoise_clicked(SELF, CTRL)] )]
     denoise_level3: RadioButton,
 
     #[nwg_control(text: "Upscale Ratio", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 0, row: 1, col_span: 2)]
+    #[nwg_layout_item(layout: tab_grid, col: 0, row: 1, col_span: 2)]
     upscale_label: nwg::Label,
 
     #[nwg_control(
@@ -125,69 +125,69 @@ pub struct Waifu2xApp {
         flags: "VISIBLE|GROUP", 
         check_state: RadioButtonState::Checked
     )]
-    #[nwg_layout_item(layout: grid, col: 2, row: 1, col_span: 1)]
+    #[nwg_layout_item(layout: tab_grid, col: 2, row: 1, col_span: 1)]
     #[nwg_events(OnButtonClick: [Waifu2xApp::upscale_clicked(SELF, CTRL)])]
     upscale_level1: RadioButton,
 
     #[nwg_control(text: "2x", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 3, row: 1, col_span: 1)]
+    #[nwg_layout_item(layout: tab_grid, col: 3, row: 1, col_span: 1)]
     #[nwg_events(OnButtonClick: [Waifu2xApp::upscale_clicked(SELF, CTRL)])]
     upscale_level2: RadioButton,
 
     #[nwg_control(text: "4x", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 4, row: 1, col_span: 1)]
+    #[nwg_layout_item(layout: tab_grid, col: 4, row: 1, col_span: 1)]
     #[nwg_events(OnButtonClick: [Waifu2xApp::upscale_clicked(SELF, CTRL)])]
     upscale_level4: RadioButton,
 
     #[nwg_control(text: "8x", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 5, row: 1, col_span: 1)]
+    #[nwg_layout_item(layout: tab_grid, col: 5, row: 1, col_span: 1)]
     #[nwg_events(OnButtonClick: [Waifu2xApp::upscale_clicked(SELF, CTRL)])]
     upscale_level8: RadioButton,
 
     #[nwg_control(text: "16x", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 6, row: 1, col_span: 1)]
+    #[nwg_layout_item(layout: tab_grid, col: 6, row: 1, col_span: 1)]
     #[nwg_events(OnButtonClick: [Waifu2xApp::upscale_clicked(SELF, CTRL)])]
     upscale_level16: RadioButton,
 
     #[nwg_control(text: "32x", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 7, row: 1, col_span: 1)]
+    #[nwg_layout_item(layout: tab_grid, col: 7, row: 1, col_span: 1)]
     #[nwg_events(OnButtonClick: [Waifu2xApp::upscale_clicked(SELF, CTRL)])]
     upscale_level32: RadioButton,
 
     #[nwg_control(text: "Enable TTA Mode (performance intensive)", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 0, row: 2, col_span: 5)]
+    #[nwg_layout_item(layout: tab_grid, col: 0, row: 2, col_span: 5)]
     #[nwg_events(OnButtonClick: [Waifu2xApp::tta_mode_clicked])]
     tta_mode: CheckBox,
 
     #[nwg_control(text: "Advanced Options", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 0, row: 3, col_span: 5)]
+    #[nwg_layout_item(layout: tab_grid, col: 0, row: 3, col_span: 5)]
     #[nwg_events(OnButtonClick: [Waifu2xApp::advanced_options_clicked])]
     advanced_options: CheckBox,
 
     #[nwg_control(text: "Thread Count", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 0, row: 4, col_span: 2)]
+    #[nwg_layout_item(layout: tab_grid, col: 0, row: 4, col_span: 2)]
     thread_label: nwg::Label,
 
     #[nwg_control(text: "1:2:2", background_color: WHITE, readonly: true)]
-    #[nwg_layout_item(layout: grid, col: 2, row: 4, col_span: 8)]
+    #[nwg_layout_item(layout: tab_grid, col: 2, row: 4, col_span: 7)]
     #[nwg_events(OnTextInput: [Waifu2xApp::thread_count_changed])]
     thread_count: TextInput,
 
     #[nwg_control(text: "GPU ID", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 0, row: 5, col_span: 2)]
+    #[nwg_layout_item(layout: tab_grid, col: 0, row: 5, col_span: 2)]
     gpu_id_label: nwg::Label,
 
     #[nwg_control(text: "auto", background_color: WHITE, readonly: true)]
-    #[nwg_layout_item(layout: grid, col: 2, row: 5, col_span: 8)]
+    #[nwg_layout_item(layout: tab_grid, col: 2, row: 5, col_span: 7)]
     #[nwg_events(OnTextInput: [Waifu2xApp::gpu_id_changed])]
     gpu_id: TextInput,
 
     #[nwg_control(text: "Waifu2x Model", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 0, row: 6, col_span: 2)]
+    #[nwg_layout_item(layout: tab_grid, col: 0, row: 6, col_span: 2)]
     model_label: nwg::Label,
 
     #[nwg_control(text: "models-cunet", background_color: WHITE, readonly: true)]
-    #[nwg_layout_item(layout: grid, col: 2, row: 6, col_span: 8)]
+    #[nwg_layout_item(layout: tab_grid, col: 2, row: 6, col_span: 7)]
     #[nwg_events(OnTextInput: [Waifu2xApp::model_path_changed])]
     model_path: TextInput,
 
@@ -197,7 +197,7 @@ pub struct Waifu2xApp {
     output_tab: Tab,
 
     #[nwg_control(text: "Output Format", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 0, row: 0, col_span: 2)]
+    #[nwg_layout_item(layout: tab_grid, col: 0, row: 0, col_span: 2)]
     format_label: nwg::Label,
 
     #[nwg_control(
@@ -206,31 +206,31 @@ pub struct Waifu2xApp {
         flags: "VISIBLE|GROUP", 
         check_state: RadioButtonState::Checked
     )]
-    #[nwg_layout_item(layout: grid, col: 2, row: 0, col_span: 1)]
+    #[nwg_layout_item(layout: tab_grid, col: 2, row: 0, col_span: 1)]
     #[nwg_events(OnButtonClick: [Waifu2xApp::format_clicked(SELF, CTRL)])]
     format_png: RadioButton,
 
     #[nwg_control(text: "JPG", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 3, row: 0, col_span: 1)]
+    #[nwg_layout_item(layout: tab_grid, col: 3, row: 0, col_span: 1)]
     #[nwg_events(OnButtonClick: [Waifu2xApp::format_clicked(SELF, CTRL)])]
     format_jpg: RadioButton,
 
     #[nwg_control(text: "WebP", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 4, row: 0, col_span: 1)]
+    #[nwg_layout_item(layout: tab_grid, col: 4, row: 0, col_span: 1)]
     #[nwg_events(OnButtonClick: [Waifu2xApp::format_clicked(SELF, CTRL)])]
     format_webp: RadioButton,
 
     #[nwg_control(text: "Output Name", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 0, row: 1, col_span: 2)]
+    #[nwg_layout_item(layout: tab_grid, col: 0, row: 1, col_span: 2)]
     filename_label: nwg::Label,
 
     #[nwg_control(text: "{name}_{scale}x_{denoise}n", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 2, row: 1, col_span: 8)]
+    #[nwg_layout_item(layout: tab_grid, col: 2, row: 1, col_span: 7)]
     #[nwg_events(OnTextInput: [Waifu2xApp::filename_changed])]
     filename_format: TextInput,
 
     #[nwg_control(text: "{name}, {scale}, {denoise}, {model} will be replaced with specific values.\nAn extension will be automatically appended to the filename.", background_color: WHITE)]
-    #[nwg_layout_item(layout: grid, col: 0, row: 2, col_span: 10, row_span: 2)]
+    #[nwg_layout_item(layout: tab_grid, col: 0, row: 2, col_span: 8, row_span: 2)]
     filename_advice_label: nwg::Label,
 
     // `tabs::output_tab` ends here
@@ -399,7 +399,13 @@ impl Waifu2xApp {
     }
 
     fn timer_ticked(&self) {
-        let mut state = self.state.borrow_mut();
+        // It is possible for the timer tick event to fire while an error
+        // message is being shown in the following while loop, which leads to
+        // a panic 
+        let state = &mut *match self.state.try_borrow_mut() {
+            Ok(x) => x,
+            Err(_) => return,
+        };
 
         let mut i = 0;
         while i < state.children.len() {
@@ -409,11 +415,6 @@ impl Waifu2xApp {
                 Ok(None) => false,
                 Ok(Some(status)) => {
                     if !status.success() {
-                        nwg::modal_error_message(
-                            &self.window,
-                            "Error",
-                            &format!("{:?}", status.code()),
-                        );
                         self.start_button.set_text("Processing... (error occured!)");
                         true
                     } else {
